@@ -51,21 +51,13 @@ python bin/so_labeling/spo_infer.py --conf_path=./conf/IE_extraction.conf --mode
 ```
 The predicted SPO triples will be saved in the folder ```./data/test_demo.res```.
 
-## Running the tests
-Not available
-
-## Contributing
-You can commit code to GITHUB, https://github.com/baidu/information-extraction.
-
 ## Discussion
 If you have any questions, you can submit an issue in github and we will respond periodically. </br>
-or 
-Baidu Hi Group: 1671051
 
 
 ## Copyright and License
 Copyright 2019 Baidu.com, Inc. All Rights Reserved </br>
-Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at </br>
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may otain a copy of the License at </br>
 ```http://www.apache.org/licenses/LICENSE-2.0``` </br>
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 
@@ -73,8 +65,8 @@ Unless required by applicable law or agreed to in writing, software distributed 
 In the released dataset, the field ‘postag’ of sentences represents the segmentation and part-of-speech tagging information. The abbreviations of part-of-speech tagging (PosTag) and their corresponding part of speech meanings are shown in the following table. </br>
 In addition, the given segmentation and part-of-speech tagging of the dataset are only references and can be replaced with other segmentation results.</br>
 
-|POS| Meaning || 
---- | --- | 
+|POS| Meaning |
+|:---|:---|
 | n |common nouns|
 | f | localizer |
 | s | space |
