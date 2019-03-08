@@ -1,6 +1,6 @@
 # Information Extraction Baseline System—InfoExtractor
 ## Abstract
-InfoExtractor is an information extraction baseline system based on the Schema constrained Knowledge Extraction dataset(SKED). InfoExtractor adopt a pipeline architecture with a p-classification model and a so-labeling model which are both implemented with PaddlePaddle. The p-classification model is a multi-label classification which employs a stacked Bi-LSTM with max-pooling network, to identify the predicate involved in the given sentence. Then a deep Bi-LSTM-CRF network is adopted with BIEO tagging scheme in the so-labeling model to label the element of subject and object mention, given the predicate which is distinguished in the p-classification model.  
+InfoExtractor is an information extraction baseline system based on the Schema constrained Knowledge Extraction dataset(SKED). InfoExtractor adopt a pipeline architecture with a p-classification model and a so-labeling model which are both implemented with PaddlePaddle. The p-classification model is a multi-label classification which employs a stacked Bi-LSTM with max-pooling network, to identify the predicate involved in the given sentence. Then a deep Bi-LSTM-CRF network is adopted with BIEO tagging scheme in the so-labeling model to label the element of subject and object mention, given the predicate which is distinguished in the p-classification model. The F1 value of InfoExtractor on the development set is 0.668.
 
 ## Getting Started
 ### Environment Requirements
