@@ -60,7 +60,7 @@ python bin/evaluation/calc_pr.py --golden_file=./data/test_demo_spo.json --predi
 ```
 
 ## Discussion
-If you have any questions, you can submit an issue in github and we will respond periodically. </br>
+If you have any question, you can submit an issue in github and we will respond periodically. </br>
 
 
 ## Copyright and License
