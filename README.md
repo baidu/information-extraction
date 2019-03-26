@@ -51,8 +51,16 @@ python bin/so_labeling/spo_infer.py --conf_path=./conf/IE_extraction.conf --mode
 ```
 The predicted SPO triples will be saved in the folder ```./data/test_demo.res```.
 
+## Evaluation
+Precision, Recall and F1 score are used as the basic evaluation metrics to measure the performance of participating systems. After obtaining the predicted triples of the model, you can run the following command. 
+Considering data security, we don't provide the alias dictionary.
+```
+zip -r ./data/test_demo.res.zip ./data/test_demo.res
+python bin/evaluation/calc_pr.py --golden_file=./data/test_demo_spo.json --predict_file=./data/test_demo.res.zip
+```
+
 ## Discussion
-If you have any questions, you can submit an issue in github and we will respond periodically. </br>
+If you have any question, you can submit an issue in github and we will respond periodically. </br>
 
 
 ## Copyright and License
