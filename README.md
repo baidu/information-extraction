@@ -81,7 +81,7 @@ In addition, the given segmentation and part-of-speech tagging of the dataset ar
 | t | time|
 | nr | noun of people|
 | ns | noun of space|
-| nt | noun of time|
+| nt | noun of tuan|
 | nw | noun of work|
 | nz | other proper noun|
 | v | verbs |
