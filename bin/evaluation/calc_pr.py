@@ -25,7 +25,8 @@ import zipfile
 import traceback
 import argparse
 import ConfigParser
-
+reload(sys)
+sys.setdefaultencoding('utf-8')
 
 SUCCESS = 0
 FILE_ERROR = 1
@@ -137,6 +138,51 @@ def load_dict(dict_filename):
     return alias_dict, ret_code
 
 
+def is_alias(spo, normalized_predict_spo, alias_dict):
+    """whether is alias as the other triples"""
+    (s, p, o) = spo
+    s_alias_set = alias_dict.get(s, set())
+    s_alias_set.add(s)
+    o_alias_set = alias_dict.get(o, set())
+    o_alias_set.add(o)
+    for s_a in s_alias_set:
+        for o_a in o_alias_set:
+            if (s_a, p, o_a) in normalized_predict_spo:
+                return True
+    return False
+    
+
+def del_duplicate(predict_spo_set, alias_dict):
+    """delete synonyms triples in predict result"""
+    normalized_predict_spo = set()
+    for spo in predict_spo_set:
+        if spo not in normalized_predict_spo and \
+                not is_alias(spo, normalized_predict_spo, alias_dict):
+            normalized_predict_spo.add(spo)
+    return normalized_predict_spo
+
+
+def is_recall_correct(golden_spo, predict_spo_set, alias_dict, loc_dict):
+    """if the correct spo is recall"""
+    if golden_spo in predict_spo_set:
+        return True
+    (golden_s, golden_p, golden_o) = golden_spo
+    loc_golden_o_set = loc_dict.get(golden_o, set())
+    for spo in predict_spo_set:
+        (s, p, o) = spo
+        if p != golden_p:
+            continue
+        s_alias_set = alias_dict.get(s, set())
+        s_alias_set.add(s)
+        o_alias_set = alias_dict.get(o, set())
+        o_alias_set.add(o)
+        if golden_s in s_alias_set and golden_o in o_alias_set:
+            return True
+        if golden_s in s_alias_set and o in loc_golden_o_set:
+            return True
+    return False
+
+
 def is_spo_correct(spo, golden_spo_set, alias_dict, loc_dict):
     """if the spo is correct"""
     if spo in golden_spo_set:
@@ -154,9 +200,8 @@ def is_spo_correct(spo, golden_spo_set, alias_dict, loc_dict):
     for golden_spo in golden_spo_set:
         (golden_s, golden_p, golden_o) = golden_spo
         golden_o_set = loc_dict.get(golden_o, set())
-        for g_o in golden_o_set:
-            if s == golden_s and p == golden_p and o == g_o:
-                return True
+        if golden_s in s_alias_set and p == golden_p and o in golden_o_set:
+            return True
     return False
 
 
@@ -169,7 +214,6 @@ def calc_pr(predict_filename, alias_filename, location_filename, \
     if ret_code != SUCCESS:
         ret_info['errorCode'] = ret_code
         ret_info['errorMsg'] = CODE_INFO[ret_code]
-        print >> sys.stderr, 'loc file is error'
         return ret_info
 
     #load alias dict
@@ -177,39 +221,40 @@ def calc_pr(predict_filename, alias_filename, location_filename, \
     if ret_code != SUCCESS:
         ret_info['errorCode'] = ret_code
         ret_info['errorMsg'] = CODE_INFO[ret_code]
-        print >> sys.stderr, 'alias file is error'
         return ret_info
     #load test dataset
     golden_dict, ret_code = load_test_dataset(golden_filename)
     if ret_code != SUCCESS:
         ret_info['errorCode'] = ret_code
         ret_info['errorMsg'] = CODE_INFO[ret_code]
-        print >> sys.stderr, 'golden file is error'
         return ret_info
     #load predict result
     predict_result, ret_code = load_predict_result(predict_filename)
     if ret_code != SUCCESS:
         ret_info['errorCode'] = ret_code
         ret_info['errorMsg'] = CODE_INFO[ret_code]
-        print >> sys.stderr, 'predict file is error'
         return ret_info
     
     #evaluation
-    correct_sum, predict_sum, recall_sum = 0.0, 0.0, 0.0
+    correct_sum, predict_sum, recall_sum, recall_correct_sum = 0.0, 0.0, 0.0, 0.0
     for sent in golden_dict:
         golden_spo_set = golden_dict[sent]
         predict_spo_set = predict_result.get(sent, set())
-        
+        normalized_predict_spo = del_duplicate(predict_spo_set, alias_dict)
         recall_sum += len(golden_spo_set)
-        predict_sum += len(predict_spo_set)
-        for spo in predict_spo_set:
+        predict_sum += len(normalized_predict_spo)
+        for spo in normalized_predict_spo:
             if is_spo_correct(spo, golden_spo_set, alias_dict, loc_dict):
                 correct_sum += 1
+        for golden_spo in golden_spo_set:
+            if is_recall_correct(golden_spo, predict_spo_set, alias_dict, loc_dict):
+                recall_correct_sum += 1
     print >> sys.stderr, 'correct spo num = ', correct_sum
     print >> sys.stderr, 'submitted spo num = ', predict_sum
     print >> sys.stderr, 'golden set spo num = ', recall_sum
+    print >> sys.stderr, 'submitted recall spo num = ', recall_correct_sum
     precision = correct_sum / predict_sum if predict_sum > 0 else 0.0
-    recall = correct_sum / recall_sum if recall_sum > 0 else 0.0
+    recall = recall_correct_sum / recall_sum if recall_sum > 0 else 0.0
     f1 = 2 * precision * recall / (precision + recall) \
             if precision + recall > 0 else 0.0
     precision = round(precision, 4)
